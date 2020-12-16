@@ -5,7 +5,7 @@ import com.lan.authentication.auth.config.shiro.jwt.JwtToken;
 import com.lan.authentication.auth.mapper.PermissionMapper;
 import com.lan.authentication.auth.mapper.RoleMapper;
 import com.lan.authentication.auth.mapper.UserMapper;
-import com.lan.authentication.auth.model.common.Constant;
+import com.lan.authentication.util.Constant;
 import com.lan.authentication.auth.entity.Permission;
 import com.lan.authentication.auth.entity.Role;
 import com.lan.authentication.auth.entity.User;

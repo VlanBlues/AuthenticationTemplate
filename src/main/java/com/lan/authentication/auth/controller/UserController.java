@@ -5,13 +5,10 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.lan.authentication.auth.exception.CustomUnauthorizedException;
-import com.lan.authentication.auth.model.common.Constant;
-import com.lan.authentication.auth.model.common.ResponseBean;
+import com.lan.authentication.util.*;
+import com.lan.authentication.util.Result;
 import com.lan.authentication.auth.entity.User;
 import com.lan.authentication.auth.service.IUserService;
-import com.lan.authentication.util.AesCipherUtil;
-import com.lan.authentication.util.JedisUtil;
-import com.lan.authentication.util.JwtUtil;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authz.annotation.Logical;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
@@ -51,7 +48,7 @@ public class UserController {
      * 登录授权
      */
     @PostMapping("/login")
-    public ResponseBean login(@RequestBody User user, HttpServletResponse httpServletResponse) {
+    public Result login(@RequestBody User user, HttpServletResponse httpServletResponse) {
         // 查询数据库中的帐号信息
         QueryWrapper<User> wrapper = new QueryWrapper<>();
         wrapper.eq("account",user.getAccount());
@@ -75,7 +72,7 @@ public class UserController {
             String token = JwtUtil.sign(user.getAccount(), currentTimeMillis);
             httpServletResponse.setHeader("Authorization", token);
             httpServletResponse.setHeader("Access-Control-Expose-Headers", "Authorization");
-            return new ResponseBean(HttpStatus.OK.value(), "登录成功(Login Success.)", null);
+            return new Result(HttpStatus.OK.value(), "登录成功(Login Success.)", null);
         } else {
             throw new CustomUnauthorizedException("帐号或密码错误(Account or Password Error.)");
         }
@@ -86,23 +83,23 @@ public class UserController {
      */
     @GetMapping
     @RequiresPermissions(logical = Logical.AND, value = {"user:view"})
-    public ResponseBean user() {
+    public Result user() {
         IPage<User> userDtoIPage = new Page<>(1,10);
         IPage<User> page = userService.page(userDtoIPage);
-        return new ResponseBean(HttpStatus.OK.value(), "查询成功(Query was successful)", page);
+        return new Result(HttpStatus.OK.value(), "查询成功(Query was successful)", page);
     }
 
     /**
      * 测试登录
      */
     @GetMapping("/article")
-    public ResponseBean article() {
+    public Result article() {
         Subject subject = SecurityUtils.getSubject();
         // 登录了返回true
         if (subject.isAuthenticated()) {
-            return new ResponseBean(HttpStatus.OK.value(), "您已经登录了(You are already logged in)", null);
+            return new Result(HttpStatus.OK.value(), "您已经登录了(You are already logged in)", null);
         } else {
-            return new ResponseBean(HttpStatus.OK.value(), "你是游客(You are guest)", null);
+            return new Result(HttpStatus.OK.value(), "你是游客(You are guest)", null);
         }
     }
     

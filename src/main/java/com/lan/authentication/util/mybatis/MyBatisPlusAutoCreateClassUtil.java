@@ -1,4 +1,4 @@
-package com.lan.authentication.util;
+package com.lan.authentication.util.mybatis;
 
 import com.baomidou.mybatisplus.core.exceptions.MybatisPlusException;
 import com.baomidou.mybatisplus.core.toolkit.StringPool;

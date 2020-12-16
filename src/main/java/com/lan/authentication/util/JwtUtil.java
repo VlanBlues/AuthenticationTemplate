@@ -6,7 +6,6 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTDecodeException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.lan.authentication.auth.exception.CustomException;
-import com.lan.authentication.auth.model.common.Constant;
 import com.lan.authentication.util.common.Base64ConvertUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

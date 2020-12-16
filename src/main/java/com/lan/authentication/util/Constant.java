@@ -1,4 +1,4 @@
-package com.lan.authentication.auth.model.common;
+package com.lan.authentication.util;
 
 /**
  * 常量

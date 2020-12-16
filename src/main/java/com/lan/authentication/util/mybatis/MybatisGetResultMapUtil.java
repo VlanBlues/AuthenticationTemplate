@@ -1,4 +1,4 @@
-package com.lan.authentication.util;
+package com.lan.authentication.util.mybatis;
 
 
 import java.lang.reflect.Field;

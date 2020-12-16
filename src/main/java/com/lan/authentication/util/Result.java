@@ -1,58 +1,86 @@
 package com.lan.authentication.util;
 
-import lombok.Data;
-
 /**
- * Author: Vlan
- * Date: 2020/10/22 9:50
+ * Result
+ * @author dolyw.com
+ * @date 2018/8/30 11:39
  */
-@Data
-public class Result<T> {
-
-    public Result(boolean success, int code) {
-        this.setSuccess(success);
-        this.setCode(code);
-    }
-
-    public Result(boolean success, int code, T data) {
-        this.setSuccess(success);
-        this.setCode(code);
-        this.setData(data);
-    }
+public class Result {
     /**
-     * 请求是否成功
-     * true:成功
-     * false：失败
+     * HTTP状态码
      */
-    private boolean success;
+    private Integer code;
 
     /**
-     * 状态码
-     * 成功：200
-     * 失败：其他
+     * 返回信息
      */
-    private int code;
+    private String msg;
 
     /**
-     * 请求数据的结果
+     * 返回的数据
      */
-    private T data;
+    private Object data;
 
-
-    public static <T> Result<T> success() {
-        return new Result<T>(true, 200);
+    public Result(int code, String msg, Object data) {
+        this.code = code;
+        this.msg = msg;
+        this.data = data;
     }
 
-    public static <T> Result<T> success(T data) {
-        return new Result<T>(true, 200, data);
+    public Result(int code, String msg) {
+        this.code = code;
+        this.msg = msg;
     }
 
-    public static <T> Result<T> fail(){
-        return new Result<>(false,400);
+    public static Result success(String msg, Object data) {
+        return new Result(200,msg,data);
     }
 
-    public static <T> Result<T> fail(T data){
-        return new Result<T>(false,400,data);
+    public static Result success(String msg) {
+        return new Result(200,msg);
     }
 
+    public static Result success(Object data) {
+        return new Result(200,null,data);
+    }
+
+    public static Result fail(Integer code, String msg, Object data) {
+        return new Result(code,msg,data);
+    }
+
+    public static Result fail(Integer code, Object data) {
+        return new Result(code,null,data);
+    }
+
+    public static Result fail(Integer code, String msg) {
+        return new Result(code,msg); 
+    }
+    
+    public static Result fail(String msg) {
+        return new Result(400,msg);
+    }
+    
+    public Integer getCode() {
+        return code;
+    }
+
+    public void setCode(Integer code) {
+        this.code = code;
+    }
+
+    public String getMsg() {
+        return msg;
+    }
+
+    public void setMsg(String msg) {
+        this.msg = msg;
+    }
+
+    public Object getData() {
+        return data;
+    }
+
+    public void setData(Object data) {
+        this.data = data;
+    }
 }

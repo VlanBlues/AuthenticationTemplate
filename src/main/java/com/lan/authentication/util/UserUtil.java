@@ -3,7 +3,6 @@ package com.lan.authentication.util;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.lan.authentication.auth.exception.CustomException;
 import com.lan.authentication.auth.mapper.UserMapper;
-import com.lan.authentication.auth.model.common.Constant;
 import com.lan.authentication.auth.entity.User;
 import org.apache.shiro.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;

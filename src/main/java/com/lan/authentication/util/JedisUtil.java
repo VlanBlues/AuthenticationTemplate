@@ -1,7 +1,6 @@
 package com.lan.authentication.util;
 
 import com.lan.authentication.auth.exception.CustomException;
-import com.lan.authentication.auth.model.common.Constant;
 import com.lan.authentication.util.common.SerializableUtil;
 import com.lan.authentication.util.common.StringUtil;
 import org.springframework.beans.factory.annotation.Autowired;

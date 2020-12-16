@@ -2,7 +2,7 @@ package com.lan.authentication.auth.config;
 
 import com.lan.authentication.auth.exception.CustomException;
 import com.lan.authentication.auth.exception.CustomUnauthorizedException;
-import com.lan.authentication.auth.model.common.ResponseBean;
+import com.lan.authentication.util.Result;
 import org.apache.shiro.ShiroException;
 import org.apache.shiro.authz.UnauthenticatedException;
 import org.apache.shiro.authz.UnauthorizedException;
@@ -35,8 +35,8 @@ public class ExceptionAdvice {
      */
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     @ExceptionHandler(ShiroException.class)
-    public ResponseBean handle401(ShiroException e) {
-        return new ResponseBean(HttpStatus.UNAUTHORIZED.value(), "无权访问(Unauthorized):" + e.getMessage(), null);
+    public Result handle401(ShiroException e) {
+        return new Result(HttpStatus.UNAUTHORIZED.value(), "无权访问(Unauthorized):" + e.getMessage(), null);
     }
 
     /**
@@ -47,8 +47,8 @@ public class ExceptionAdvice {
      */
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     @ExceptionHandler(UnauthorizedException.class)
-    public ResponseBean handle401(UnauthorizedException e) {
-        return new ResponseBean(HttpStatus.UNAUTHORIZED.value(), "无权访问(Unauthorized):当前Subject没有此请求所需权限(" + e.getMessage() + ")", null);
+    public Result handle401(UnauthorizedException e) {
+        return new Result(HttpStatus.UNAUTHORIZED.value(), "无权访问(Unauthorized):当前Subject没有此请求所需权限(" + e.getMessage() + ")", null);
     }
 
     /**
@@ -59,8 +59,8 @@ public class ExceptionAdvice {
      */
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     @ExceptionHandler(UnauthenticatedException.class)
-    public ResponseBean handle401(UnauthenticatedException e) {
-        return new ResponseBean(HttpStatus.UNAUTHORIZED.value(), "无权访问(Unauthorized):当前Subject是匿名Subject，请先登录(This subject is anonymous.)", null);
+    public Result handle401(UnauthenticatedException e) {
+        return new Result(HttpStatus.UNAUTHORIZED.value(), "无权访问(Unauthorized):当前Subject是匿名Subject，请先登录(This subject is anonymous.)", null);
     }
 
     /**
@@ -69,8 +69,8 @@ public class ExceptionAdvice {
      */
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     @ExceptionHandler(CustomUnauthorizedException.class)
-    public ResponseBean handle401(CustomUnauthorizedException e) {
-        return new ResponseBean(HttpStatus.UNAUTHORIZED.value(), "无权访问(Unauthorized):" + e.getMessage(), null);
+    public Result handle401(CustomUnauthorizedException e) {
+        return new Result(HttpStatus.UNAUTHORIZED.value(), "无权访问(Unauthorized):" + e.getMessage(), null);
     }
 
     /**
@@ -79,10 +79,10 @@ public class ExceptionAdvice {
      */
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(BindException.class)
-    public ResponseBean validException(BindException e) {
+    public Result validException(BindException e) {
         List<FieldError> fieldErrors = e.getBindingResult().getFieldErrors();
         Map<String, Object> result = this.getValidError(fieldErrors);
-        return new ResponseBean(HttpStatus.BAD_REQUEST.value(), result.get("errorMsg").toString(), result.get("errorList"));
+        return new Result(HttpStatus.BAD_REQUEST.value(), result.get("errorMsg").toString(), result.get("errorList"));
     }
 
     /**
@@ -91,10 +91,10 @@ public class ExceptionAdvice {
      */
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseBean validException(MethodArgumentNotValidException e) {
+    public Result validException(MethodArgumentNotValidException e) {
         List<FieldError> fieldErrors = e.getBindingResult().getFieldErrors();
         Map<String, Object> result = this.getValidError(fieldErrors);
-        return new ResponseBean(HttpStatus.BAD_REQUEST.value(), result.get("errorMsg").toString(), result.get("errorList"));
+        return new Result(HttpStatus.BAD_REQUEST.value(), result.get("errorMsg").toString(), result.get("errorList"));
     }
 
     /**
@@ -103,8 +103,8 @@ public class ExceptionAdvice {
      */
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(CustomException.class)
-    public ResponseBean handle(CustomException e) {
-        return new ResponseBean(HttpStatus.BAD_REQUEST.value(), e.getMessage(), null);
+    public Result handle(CustomException e) {
+        return new Result(HttpStatus.BAD_REQUEST.value(), e.getMessage(), null);
     }
 
     /**
@@ -113,8 +113,8 @@ public class ExceptionAdvice {
      */
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @ExceptionHandler(NoHandlerFoundException.class)
-    public ResponseBean handle(NoHandlerFoundException e) {
-        return new ResponseBean(HttpStatus.NOT_FOUND.value(), e.getMessage(), null);
+    public Result handle(NoHandlerFoundException e) {
+        return new Result(HttpStatus.NOT_FOUND.value(), e.getMessage(), null);
     }
 
     /**
@@ -125,8 +125,8 @@ public class ExceptionAdvice {
      */
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler(Exception.class)
-    public ResponseBean globalException(HttpServletRequest request, Throwable ex) {
-        return new ResponseBean(this.getStatus(request).value(), ex.toString() + ": " + ex.getMessage(), null);
+    public Result globalException(HttpServletRequest request, Throwable ex) {
+        return new Result(this.getStatus(request).value(), ex.toString() + ": " + ex.getMessage(), null);
     }
 
     /**

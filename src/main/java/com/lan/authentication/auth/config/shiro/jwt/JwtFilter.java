@@ -3,8 +3,8 @@ package com.lan.authentication.auth.config.shiro.jwt;
 import com.auth0.jwt.exceptions.SignatureVerificationException;
 import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.lan.authentication.auth.exception.CustomException;
-import com.lan.authentication.auth.model.common.Constant;
-import com.lan.authentication.auth.model.common.ResponseBean;
+import com.lan.authentication.util.Constant;
+import com.lan.authentication.util.Result;
 import com.lan.authentication.util.JedisUtil;
 import com.lan.authentication.util.JwtUtil;
 import com.lan.authentication.util.common.JsonConvertUtil;
@@ -159,6 +159,7 @@ public class JwtFilter extends BasicHttpAuthenticationFilter {
             // Redis中RefreshToken还存在，获取RefreshToken的时间戳
             String currentTimeMillisRedis = JedisUtil.getObject(Constant.PREFIX_SHIRO_REFRESH_TOKEN + account).toString();
             // 获取当前AccessToken中的时间戳，与RefreshToken的时间戳对比，如果当前时间戳一致，进行AccessToken刷新
+            String claim = JwtUtil.getClaim(token, Constant.CURRENT_TIME_MILLIS);
             if (JwtUtil.getClaim(token, Constant.CURRENT_TIME_MILLIS).equals(currentTimeMillisRedis)) {
                 // 获取当前最新时间戳
                 String currentTimeMillis = String.valueOf(System.currentTimeMillis());
@@ -192,7 +193,7 @@ public class JwtFilter extends BasicHttpAuthenticationFilter {
         httpServletResponse.setCharacterEncoding("UTF-8");
         httpServletResponse.setContentType("application/json; charset=utf-8");
         try (PrintWriter out = httpServletResponse.getWriter()) {
-            String data = JsonConvertUtil.objectToJson(new ResponseBean(HttpStatus.UNAUTHORIZED.value(), "无权访问(Unauthorized):" + msg, null));
+            String data = JsonConvertUtil.objectToJson(new Result(HttpStatus.UNAUTHORIZED.value(), "无权访问(Unauthorized):" + msg, null));
             out.append(data);
         } catch (IOException e) {
             logger.error("直接返回Response信息出现IOException异常:{}", e.getMessage());

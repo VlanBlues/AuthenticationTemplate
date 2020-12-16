@@ -1,6 +1,6 @@
 package com.lan.authentication.auth.config.shiro.cache;
 
-import com.lan.authentication.auth.model.common.Constant;
+import com.lan.authentication.util.Constant;
 import com.lan.authentication.util.JedisUtil;
 import com.lan.authentication.util.JwtUtil;
 import com.lan.authentication.util.common.PropertiesUtil;
