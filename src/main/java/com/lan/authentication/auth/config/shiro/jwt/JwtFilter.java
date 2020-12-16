@@ -3,18 +3,19 @@ package com.lan.authentication.auth.config.shiro.jwt;
 import com.auth0.jwt.exceptions.SignatureVerificationException;
 import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.lan.authentication.auth.exception.CustomException;
-import com.lan.authentication.util.Constant;
-import com.lan.authentication.util.Result;
-import com.lan.authentication.util.JedisUtil;
-import com.lan.authentication.util.JwtUtil;
+import com.lan.authentication.util.*;
 import com.lan.authentication.util.common.JsonConvertUtil;
 import com.lan.authentication.util.common.PropertiesUtil;
 import org.apache.shiro.web.filter.authc.BasicHttpAuthenticationFilter;
 import org.apache.shiro.web.util.WebUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpStatus;
 
+import javax.annotation.Resource;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
@@ -32,6 +33,12 @@ public class JwtFilter extends BasicHttpAuthenticationFilter {
      * logger
      */
     private static final Logger logger = LoggerFactory.getLogger(JwtFilter.class);
+    
+    @Autowired
+    private RedisUtil redisUtil;
+    
+    @Value("${refreshTokenExpireTime}")
+    private String refreshTokenExpireTime;
 
     /**
      * 这里我们详细说明下为什么最终返回的都是true，即允许访问
@@ -121,9 +128,13 @@ public class JwtFilter extends BasicHttpAuthenticationFilter {
     protected boolean executeLogin(ServletRequest request, ServletResponse response) throws Exception {
         // 拿到当前Header中Authorization的AccessToken(Shiro中getAuthzHeader方法已经实现)
         JwtToken token = new JwtToken(this.getAuthzHeader(request));
+        String authzHeader = this.getAuthzHeader(request);
+        String claim = JwtUtil.getClaim(this.getAuthzHeader(request), Constant.CURRENT_TIME_MILLIS);
+        System.out.println("claim----------------"+claim);
         // 提交给UserRealm进行认证，如果错误他会抛出异常并被捕获
         this.getSubject(request, response).login(token);
         // 如果没有抛出异常则代表登入成功，返回true
+        System.out.println("登录认证");
         return true;
     }
 
@@ -155,19 +166,20 @@ public class JwtFilter extends BasicHttpAuthenticationFilter {
         // 获取当前Token的帐号信息
         String account = JwtUtil.getClaim(token, Constant.ACCOUNT);
         // 判断Redis中RefreshToken是否存在
-        if (JedisUtil.exists(Constant.PREFIX_SHIRO_REFRESH_TOKEN + account)) {
+        String test = Constant.PREFIX_SHIRO_REFRESH_TOKEN + account;
+        Object o = redisUtil.get(Constant.PREFIX_SHIRO_REFRESH_TOKEN + account);
+        boolean b = redisUtil.hasKey(Constant.PREFIX_SHIRO_REFRESH_TOKEN + account);
+        if (b) {
             // Redis中RefreshToken还存在，获取RefreshToken的时间戳
-            String currentTimeMillisRedis = JedisUtil.getObject(Constant.PREFIX_SHIRO_REFRESH_TOKEN + account).toString();
+            String currentTimeMillisRedis = redisUtil.get(Constant.PREFIX_SHIRO_REFRESH_TOKEN + account).toString();
             // 获取当前AccessToken中的时间戳，与RefreshToken的时间戳对比，如果当前时间戳一致，进行AccessToken刷新
             String claim = JwtUtil.getClaim(token, Constant.CURRENT_TIME_MILLIS);
+            System.out.println("claim2-----"+claim);
             if (JwtUtil.getClaim(token, Constant.CURRENT_TIME_MILLIS).equals(currentTimeMillisRedis)) {
                 // 获取当前最新时间戳
                 String currentTimeMillis = String.valueOf(System.currentTimeMillis());
-                // 读取配置文件，获取refreshTokenExpireTime属性
-                PropertiesUtil.readProperties("config.properties");
-                String refreshTokenExpireTime = PropertiesUtil.getProperty("refreshTokenExpireTime");
                 // 设置RefreshToken中的时间戳为当前最新时间戳，且刷新过期时间重新为30分钟过期(配置文件可配置refreshTokenExpireTime属性)
-                JedisUtil.setObject(Constant.PREFIX_SHIRO_REFRESH_TOKEN + account, currentTimeMillis, Integer.parseInt(refreshTokenExpireTime));
+                redisUtil.set(Constant.PREFIX_SHIRO_REFRESH_TOKEN + account, currentTimeMillis, Integer.parseInt(refreshTokenExpireTime));
                 // 刷新AccessToken，设置时间戳为当前最新时间戳
                 token = JwtUtil.sign(account, currentTimeMillis);
                 // 将新刷新的AccessToken再次进行Shiro的登录

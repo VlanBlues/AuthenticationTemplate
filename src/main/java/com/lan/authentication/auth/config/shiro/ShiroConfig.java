@@ -1,7 +1,7 @@
 package com.lan.authentication.auth.config.shiro;
 
-import com.lan.authentication.auth.config.shiro.cache.CustomCacheManager;
 import com.lan.authentication.auth.config.shiro.jwt.JwtFilter;
+import com.lan.authentication.util.RedisUtil;
 import org.apache.shiro.mgt.DefaultSessionStorageEvaluator;
 import org.apache.shiro.mgt.DefaultSubjectDAO;
 import org.apache.shiro.spring.LifecycleBeanPostProcessor;
@@ -47,7 +47,7 @@ public class ShiroConfig {
         subjectDAO.setSessionStorageEvaluator(defaultSessionStorageEvaluator);
         defaultWebSecurityManager.setSubjectDAO(subjectDAO);
         // 设置自定义Cache缓存
-        defaultWebSecurityManager.setCacheManager(new CustomCacheManager());
+        //defaultWebSecurityManager.setCacheManager(new CustomCacheManager());
         return defaultWebSecurityManager;
     }
 
@@ -74,7 +74,7 @@ public class ShiroConfig {
         ShiroFilterFactoryBean factoryBean = new ShiroFilterFactoryBean();
         // 添加自己的过滤器取名为jwt
         Map<String, Filter> filterMap = new HashMap<>(16);
-        filterMap.put("jwt", new JwtFilter());
+        filterMap.put("jwt", getJwtFilter());
         factoryBean.setFilters(filterMap);
         factoryBean.setSecurityManager(securityManager);
         // 自定义url规则使用LinkedHashMap有序Map
@@ -118,4 +118,10 @@ public class ShiroConfig {
         advisor.setSecurityManager(securityManager);
         return advisor;
     }
+    
+    @Bean
+    public JwtFilter getJwtFilter(){
+        return new JwtFilter();
+    }
+    
 }

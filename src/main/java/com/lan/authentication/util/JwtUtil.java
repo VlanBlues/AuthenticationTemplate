@@ -83,8 +83,8 @@ public class JwtUtil {
             // 只能输出String类型，如果是其他类型返回null
             return jwt.getClaim(claim).asString();
         } catch (JWTDecodeException e) {
-            logger.error("解密Token中的公共信息出现JWTDecodeException异常:{}", e.getMessage());
-            throw new CustomException("解密Token中的公共信息出现JWTDecodeException异常:" + e.getMessage());
+            logger.error("Token解析错误");
+            throw new CustomException("Token解析错误");
         }
     }
 

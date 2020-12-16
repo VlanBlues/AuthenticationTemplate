@@ -64,18 +64,18 @@ spring:
       max-request-size: 10MB
 
   #redis配置
-#  redis:
-#    database: 0
-#    host: 127.0.0.1
-#    lettuce:
-#      pool:
-#        max-active: 8   #最大连接数据库连接数,设 0 为没有限制
-#        max-idle: 8     #最大等待连接中的数量,设 0 为没有限制
-#        max-wait: -1ms  #最大建立连接等待时间。如果超过此时间将接到异常。设为-1表示无限制。
-#        min-idle: 0     #最小等待连接中的数量,设 0 为没有限制
-#      shutdown-timeout: 100ms
-#    password: 
-#    port: 6379
+  redis:
+    database: 0
+    host: 127.0.0.1
+    lettuce:
+      pool:
+        max-active: 8   #最大连接数据库连接数,设 0 为没有限制
+        max-idle: 8     #最大等待连接中的数量,设 0 为没有限制
+        max-wait: -1ms  #最大建立连接等待时间。如果超过此时间将接到异常。设为-1表示无限制。
+        min-idle: 0     #最小等待连接中的数量,设 0 为没有限制
+      shutdown-timeout: 100ms
+    password: 
+    port: 6379
 
 #mybatis plus设置
 mybatis-plus:
@@ -97,6 +97,17 @@ mybatis-plus:
 logging:
   level:
     com.lan.authentication.mapper: debug
+
+# AES密码加密私钥(Base64加密)
+encryptAESKey: V2FuZzkyNjQ1NGRTQkFQSUpXVA==
+# JWT认证加密私钥(Base64加密)
+encryptJWTKey: U0JBUElKV1RkV2FuZzkyNjQ1NA==
+# AccessToken过期时间-5分钟-5*60(秒为单位)
+accessTokenExpireTime: 300
+# RefreshToken过期时间-30分钟-30*60(秒为单位)
+refreshTokenExpireTime: 1800
+# Shiro缓存过期时间-5分钟-5*60(秒为单位)(一般设置与AccessToken过期时间一致)
+shiroCacheExpireTime: 300
 
 
 

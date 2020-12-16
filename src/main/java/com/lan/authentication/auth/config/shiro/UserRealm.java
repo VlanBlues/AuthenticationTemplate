@@ -9,8 +9,8 @@ import com.lan.authentication.util.Constant;
 import com.lan.authentication.auth.entity.Permission;
 import com.lan.authentication.auth.entity.Role;
 import com.lan.authentication.auth.entity.User;
-import com.lan.authentication.util.JedisUtil;
 import com.lan.authentication.util.JwtUtil;
+import com.lan.authentication.util.RedisUtil;
 import com.lan.authentication.util.common.StringUtil;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
@@ -23,6 +23,7 @@ import org.apache.shiro.subject.PrincipalCollection;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import java.util.List;
 
 /**
@@ -36,6 +37,9 @@ public class UserRealm extends AuthorizingRealm {
     private final UserMapper userMapper;
     private final RoleMapper roleMapper;
     private final PermissionMapper permissionMapper;
+
+    @Resource
+    private RedisUtil redisUtil;
 
     @Autowired
     public UserRealm(UserMapper userMapper, RoleMapper roleMapper, PermissionMapper permissionMapper) {
@@ -100,9 +104,9 @@ public class UserRealm extends AuthorizingRealm {
             throw new AuthenticationException("该帐号不存在(The account does not exist.)");
         }
         // 开始认证，要AccessToken认证通过，且Redis中存在RefreshToken，且两个Token时间戳一致
-        if (JwtUtil.verify(token) && JedisUtil.exists(Constant.PREFIX_SHIRO_REFRESH_TOKEN + account)) {
+        if (JwtUtil.verify(token) && redisUtil.hasKey(Constant.PREFIX_SHIRO_REFRESH_TOKEN + account)) {
             // 获取RefreshToken的时间戳
-            String currentTimeMillisRedis = JedisUtil.getObject(Constant.PREFIX_SHIRO_REFRESH_TOKEN + account).toString();
+            String currentTimeMillisRedis = redisUtil.get(Constant.PREFIX_SHIRO_REFRESH_TOKEN + account).toString();
             // 获取AccessToken时间戳，与RefreshToken的时间戳对比
             if (JwtUtil.getClaim(token, Constant.CURRENT_TIME_MILLIS).equals(currentTimeMillisRedis)) {
                 return new SimpleAuthenticationInfo(token, token, "userRealm");

@@ -33,6 +33,8 @@ import javax.servlet.http.HttpServletResponse;
 public class UserController {
     @Resource
     private IUserService userService;
+    @Resource
+    private RedisUtil redisUtil;
     
     @RequestMapping("/test")
     public String ClassName(){
@@ -61,12 +63,12 @@ public class UserController {
         // 因为密码加密是以帐号+密码的形式进行加密的，所以解密后的对比是帐号+密码
         if (key.equals(user.getAccount() + user.getPassword())) {
             // 清除可能存在的Shiro权限信息缓存
-            if (JedisUtil.exists(Constant.PREFIX_SHIRO_CACHE + user.getAccount())) {
-                JedisUtil.delKey(Constant.PREFIX_SHIRO_CACHE + user.getAccount());
+            if (redisUtil.hasKey(Constant.PREFIX_SHIRO_CACHE + user.getAccount())) {
+                redisUtil.del(Constant.PREFIX_SHIRO_CACHE + user.getAccount());
             }
             // 设置RefreshToken，时间戳为当前时间戳，直接设置即可(不用先删后设，会覆盖已有的RefreshToken)
             String currentTimeMillis = String.valueOf(System.currentTimeMillis());
-            JedisUtil.setObject(Constant.PREFIX_SHIRO_REFRESH_TOKEN + user.getAccount(), currentTimeMillis,
+            redisUtil.set(Constant.PREFIX_SHIRO_REFRESH_TOKEN + user.getAccount(), currentTimeMillis,
                     Integer.parseInt(refreshTokenExpireTime));
             // 从Header中Authorization返回AccessToken，时间戳为当前时间戳
             String token = JwtUtil.sign(user.getAccount(), currentTimeMillis);
